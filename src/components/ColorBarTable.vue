@@ -24,7 +24,7 @@
     :pagination="false"
     bordered
     :scroll="{
-      x: '100%',
+      x: 'calc(max(100%, 1000px))',
       y: 'calc(100vh - 260px)',
     }"
   >

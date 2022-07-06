@@ -99,7 +99,7 @@ const columns = [
     sorter: (a, b) => a.rating - b.rating,
   },
   {
-    title: '效率',
+    title: '效率/小时',
     dataIndex: 'efficiency',
   },
 ];
@@ -170,7 +170,7 @@ const resolvedEggStats = computed(() => {
     egg.timeStr = h(TwoLineText, { majorText: formatTime(egg.calcTime), minorText: formatTime(egg.time)});
     egg.probStr = (egg.prob * 100).toFixed(3) + '%';
     egg.color = egg.money == egg.expval ? '#ffff80' : egg.money > egg.expval ? '#ff8080' : '#8080ff';
-    egg.efficiency = egg.money >= egg.expval ? (egg.money / egg.calcTime * 3600).toFixed(2) + '金币/小时' : (egg.exp / egg.calcTime * 3600).toFixed(2) + '经验/小时';
+    egg.efficiency = egg.money >= egg.expval ? (egg.money / egg.calcTime * 3600).toFixed(2) + '金币' : (egg.exp / egg.calcTime * 3600).toFixed(2) + '经验';
   });
   return result;
 });
@@ -244,7 +244,7 @@ const getSummary = zone => {
     money: money.toFixed(2) + '/抽',
     exp: exp.toFixed(2) + '/抽',
     rating: time ? ((money + exp * config.expval) / time * 60).toFixed(3) : '--',
-    efficiency: time ? `${(money / time * 3600).toFixed(2)}金币/小时<br>${(exp / time * 3600).toFixed(2)}经验/小时` : '--',
+    efficiency: time ? `${(money / time * 3600).toFixed(2)}金币<br>${(exp / time * 3600).toFixed(2)}经验` : '--',
   };
 };
 
