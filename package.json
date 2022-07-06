@@ -5,19 +5,33 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "deploy": "git subtree push --prefix dist origin gh-pages"
   },
   "dependencies": {
+    "ant-design-vue": "^3.2.9",
+    "axios": "^0.27.2",
+    "babel-plugin-import": "^1.13.5",
     "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "less-loader": "^11.0.0",
+    "lodash": "^4.17.21",
+    "vue": "^3.2.13",
+    "vue-eslint-parser": "^9.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@typescript-eslint/eslint-plugin": "^5.30.5",
+    "@typescript-eslint/parser": "^5.30.5",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
-    "eslint": "^7.32.0",
+    "@vue/eslint-config-standard": "^7.0.0",
+    "babel-plugin-lodash": "^3.3.4",
+    "eslint": "^8.19.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-vue": "^8.0.3"
   },
   "eslintConfig": {
@@ -27,7 +41,8 @@
     },
     "extends": [
       "plugin:vue/vue3-essential",
-      "eslint:recommended"
+      "eslint:recommended",
+      "@vue/standard"
     ],
     "parserOptions": {
       "parser": "@babel/eslint-parser"
