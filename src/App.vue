@@ -99,6 +99,7 @@ const columns = [
     tooltip: '=max(派遣金币, 强化经验 * 经验价值) / 孵化时间',
     dataIndex: 'rating',
     sorter: (a, b) => a.rating - b.rating,
+    defaultSortOrder: 'descend',
   },
   {
     title: '效率/小时',
@@ -271,18 +272,21 @@ const resolveOverview = () => {
     ...getSummary(id),
     name: info.name,
   }));
-  const maxMoney = _.maxBy(summaries, summary => summary.moneyEffic).moneyEffic;
-  const maxExp = _.maxBy(summaries, summary => summary.expEffic).expEffic;
-  const maxValue = _.max([maxMoney + 180, maxExp * config.expval]);
+  let maxValue = 0, minMoney = _.min([_.minBy(summaries, summary => summary.moneyEffic).moneyEffic, 0]);
+  summaries.forEach(summary => {
+    let value = summary.moneyEffic - minMoney + summary.expEffic * config.expval;
+    if (value > maxValue) maxValue = value;
+    if (summary.moneyEffic < minMoney) minMoney = summary.moneyEffic;
+  });
 
   summaries.forEach(summary => {
     summary.color = summary.moneyEffic > 0 ? '#ff8080' : '#ffbbbb';
-    summary.width = interpolation(summary.moneyEffic + 180, 0, maxValue, 0, 1);
+    summary.width = interpolation(summary.moneyEffic, minMoney, maxValue, 0, 1);
     summary.color2 = '#8080ff';
-    summary.width2 = maxExp ? interpolation(summary.expEffic * config.expval, 0, maxValue, 0, 1) : 0;
+    summary.width2 = interpolation(summary.expEffic * config.expval, 0, maxValue, 0, 1);
     summary.efficiency = h('span', { innerHTML: summary.efficiency });
+    if (summary.width + summary.width2 > 1) console.log(summary);
   });
-  console.log(summaries);
   return summaries;
 };
 </script>
