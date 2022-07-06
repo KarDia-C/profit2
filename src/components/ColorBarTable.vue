@@ -4,20 +4,20 @@
     :custom-row="
       record => ({
         style: {
-          background: `linear-gradient(120deg, ${record.color}, transparent ${
-            record.width * 100
-          }%, transparent)`,
+          background: `linear-gradient(120deg, ${record.color}, transparent ${record.width * 100}%, transparent${
+            record.color2
+              ? ` ${(1 - record.width2) * 100}%, ${record.color2}`
+              : ''})`,
         },
       })
     "
-    :row-selection="{
+    :row-selection="showSelection ? {
       columnTitle: selectionTitle,
       getCheckboxProps: _ => ({ disabled: selectionDisabled }),
       selectedRowKeys: selection,
       columnWidth: '104px',
-      // eslint-disable-next-line vue/no-mutating-props
       onChange: newSelected => $emit('update:selection', newSelected),
-    }"
+    } : undefined"
 
     :show-sorter-tooltip="false"
     :sort-directions="['descend', 'ascend']"
@@ -56,6 +56,7 @@ import { Table, Tooltip } from 'ant-design-vue';
 
 const props = defineProps({
   columns: Array,
+  showSelection: Boolean,
   selectionDisabled: Boolean,
   selection: {
     type: Array,
@@ -78,5 +79,9 @@ defineEmits(['update:selection']);
 }
 :deep() .ant-table-cell {
   padding: 4px 16px !important;
+}
+
+:deep() .ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner::after {
+  border-color: rgba(0, 0, 0, .6);
 }
 </style>

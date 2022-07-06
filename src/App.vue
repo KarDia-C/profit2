@@ -17,8 +17,9 @@
           <Select
             v-model:value="selectedZone"
             :options="zoneOptions"
-            :loading="!zoneOptions.length"
-            :disabled="!zoneOptions.length"
+            :loading="zoneOptions.length === 1"
+            :disabled="zoneOptions.length === 1"
+            :dropdown-match-select-width="false"
           />
         </Col>
         <Col :span="6">
@@ -47,6 +48,7 @@
             :selection-title="h(StrategySelector)"
             :selection-disabled="config.strategy.type !== STRATEGY_MANUAL"
             :summary="getCurrentSummary"
+            :show-selection="showSelection"
           />
         </Col>
       </Row>
@@ -140,10 +142,15 @@ onMounted(() => {
     });
 });
 
-const zoneOptions = computed(() => _.toPairs(zoneData.value).map(([id, info]) => ({
+const zoneOptions = computed(() => [{
+  value: 'overview',
+  label: '总览',
+}].concat(_.toPairs(zoneData.value).map(([id, info]) => ({
   value: id,
   label: `${info.name} (${getSummary(id).rating})`,
-})));
+}))));
+
+const showSelection = computed(() => selectedZone.value !== 'overview');
 
 const formatTime = seconds => {
   let hours, minutes;
@@ -156,6 +163,7 @@ const formatTime = seconds => {
 
 const resolvedEggStats = computed(() => {
   if (zoneData.value === null) return [];
+  if (selectedZone.value === 'overview') return resolveOverview();
   let calcTime, expval;
   let result = zoneData.value[selectedZone.value].eggs.map(egg => ({
       ...egg,
@@ -205,6 +213,7 @@ const getSelectionManually = zone => {
 const getSelection = zone => {
   if (zoneData.value === null) return [];
   if (zone === undefined) zone = selectedZone.value;
+  if (zone === 'overview') return [];
   if (config.strategy.type === STRATEGY_AUTOMATIC) return getSelectionAutomatically(zone);
   if (config.strategy.type === STRATEGY_ALL) return getSelectionAll(zone);
   if (config.strategy.type === STRATEGY_MANUAL) return getSelectionManually(zone);
@@ -222,6 +231,7 @@ const getCurrentSelection = computed({
 
 const getSummary = zone => {
   if (zone === undefined) zone = selectedZone.value;
+  if (zone === 'overview') return [];
   const selection = new Set(getSelection(zone));
   const eggs = zoneData.value?.[zone].eggs ?? [];
 
@@ -237,6 +247,8 @@ const getSummary = zone => {
     }
   });
 
+  const moneyEffic = money / time * 3600, expEffic = exp / time * 3600;
+
   return {
     name: '总计',
     probStr: (prob * 100).toFixed(3) + '%',
@@ -244,12 +256,35 @@ const getSummary = zone => {
     money: money.toFixed(2) + '/抽',
     exp: exp.toFixed(2) + '/抽',
     rating: time ? ((money + exp * config.expval) / time * 60).toFixed(3) : '--',
-    efficiency: time ? `${(money / time * 3600).toFixed(2)}金币<br>${(exp / time * 3600).toFixed(2)}经验` : '--',
+    moneyEffic,
+    expEffic,
+    efficiency: time ? `${moneyEffic.toFixed(2)}金币<br>${expEffic.toFixed(2)}经验` : '--',
   };
 };
 
 const getCurrentSummary = computed(getSummary);
 
+const interpolation = (x, x0, x1, y0, y1) => y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+
+const resolveOverview = () => {
+  const summaries = _.toPairs(zoneData.value).map(([id, info]) => ({
+    ...getSummary(id),
+    name: info.name,
+  }));
+  const maxMoney = _.maxBy(summaries, summary => summary.moneyEffic).moneyEffic;
+  const maxExp = _.maxBy(summaries, summary => summary.expEffic).expEffic;
+  const maxValue = _.max([maxMoney + 180, maxExp * config.expval]);
+
+  summaries.forEach(summary => {
+    summary.color = summary.moneyEffic > 0 ? '#ff8080' : '#ffbbbb';
+    summary.width = interpolation(summary.moneyEffic + 180, 0, maxValue, 0, 1);
+    summary.color2 = '#8080ff';
+    summary.width2 = maxExp ? interpolation(summary.expEffic * config.expval, 0, maxValue, 0, 1) : 0;
+    summary.efficiency = h('span', { innerHTML: summary.efficiency });
+  });
+  console.log(summaries);
+  return summaries;
+};
 </script>
 
 <style lang="less" scoped>
