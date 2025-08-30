@@ -28,14 +28,14 @@
         <Col :span="2">
           <TwoLineText
             major-text="经验价值："
-            minor-text="推荐4.8~5.2"
+            minor-text="推荐?"
           />
         </Col>
         <Col :span="6">
-          <Slider v-model:value="config.expval" :min="1.5" :max="10" :step="0.1" />
+          <Slider v-model:value="config.expval" :min="2" :max="7" :step="0.01" />
         </Col>
         <Col :span="4">
-          <InputNumber v-model:value="config.expval" :min="1.5" :max="10" />
+          <InputNumber v-model:value="config.expval" :min="2" :max="7" :step="0.05" />
         </Col>
       </Row>
 
@@ -74,7 +74,7 @@ const columns = [
   },
   {
     title: '概率*',
-    tooltip: h('span', { innerHTML: '概率已包含保底：<br>一星74.820%<br>二星24.607%<br>三星0.573%' }),
+    // tooltip: h('span', { innerHTML: '概率已包含保底：<br>一星74.820%<br>二星24.607%<br>三星0.573%' }),
     dataIndex: 'probStr',
     sorter: (a, b) => a.prob - b.prob,
   },
@@ -108,7 +108,7 @@ const columns = [
 ];
 
 const zoneData = shallowRef(null);
-const selectedZone = ref('1');
+const selectedZone = ref('2');
 let eggsData = null;
 
 onMounted(() => {
@@ -122,7 +122,7 @@ onMounted(() => {
         let eggs = [];
 
         for (let star in zone.weight) {
-          const prob = [.7482, .24607, .00573][parseInt(star) - 1];
+          const prob = [.99, .01, 0.][parseInt(star) - 1];
           const weightSum = _.sum(_.values(zone.weight[star]));
           Object.entries(zone.weight[star]).forEach(([key, weight]) => {
             eggs.push({

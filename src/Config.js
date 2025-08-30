@@ -24,7 +24,7 @@ const config = reactive(_.defaultsDeep(
       type: STRATEGY_AUTOMATIC,
       manualSettings: {},
     },
-    expval: 5,
+    expval: 3.3,
   },
 ));
 
